@@ -50,6 +50,14 @@ function normalizeItems(payload) {
 
 function buildApiUrl(resourceName, endpointPath) {
   const normalizedEndpoint = endpointPath?.trim() || `/api/${resourceName}/`
+
+  if (/^https?:\/\//.test(normalizedEndpoint)) {
+    return {
+      url: normalizedEndpoint,
+      isFallback: normalizedEndpoint.startsWith('http://localhost:8000'),
+    }
+  }
+
   const codespaceName = import.meta.env.VITE_CODESPACE_NAME?.trim()
 
   if (codespaceName) {
