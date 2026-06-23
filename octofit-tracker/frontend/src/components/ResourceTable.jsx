@@ -48,29 +48,33 @@ function normalizeItems(payload) {
   }
 }
 
-function buildApiUrl(resourceName) {
+function buildApiUrl(resourceName, endpointPath) {
+  const normalizedEndpoint = endpointPath?.trim() || `/api/${resourceName}/`
   const codespaceName = import.meta.env.VITE_CODESPACE_NAME?.trim()
 
   if (codespaceName) {
     return {
-      url: `https://${codespaceName}-8000.app.github.dev/api/${resourceName}/`,
+      url: `https://${codespaceName}-8000.app.github.dev${normalizedEndpoint}`,
       isFallback: false,
     }
   }
 
   return {
-    url: `http://localhost:8000/api/${resourceName}/`,
+    url: `http://localhost:8000${normalizedEndpoint}`,
     isFallback: true,
   }
 }
 
-function ResourceTable({ title, resourceName }) {
+function ResourceTable({ title, resourceName, endpointPath }) {
   const [rows, setRows] = useState([])
   const [meta, setMeta] = useState({ total: 0, next: null, previous: null })
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const { url, isFallback } = useMemo(() => buildApiUrl(resourceName), [resourceName])
+  const { url, isFallback } = useMemo(
+    () => buildApiUrl(resourceName, endpointPath),
+    [resourceName, endpointPath],
+  )
 
   useEffect(() => {
     let cancelled = false
